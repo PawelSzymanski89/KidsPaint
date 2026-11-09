@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KidsPaint UX v2 — Bezpośredni Dostęp do Narzędzi + Duża Paleta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F0F4F8;
+      --text: #0F172A;
+      --coral: #FF5A5F;
+      --yellow: #FFB703;
+      --green: #06D6A0;
+      --blue: #118AB2;
+      --purple: #7B2CBF;
+      --pink: #FF70A6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Fredoka', 'Nunito', sans-serif;
+      background: #E2E8F0;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: white;
+      padding: 14px 24px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #FF5A5F, #FFB703);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(255, 90, 95, 0.3);
+    }
+    .brand h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0F172A;
+    }
+    .brand span {
+      font-size: 13px;
+      color: #64748B;
+      font-weight: 600;
+    }
+
+    .variant-nav {
+      display: flex;
+      gap: 6px;
+      background: #F1F5F9;
+      padding: 5px;
+      border-radius: 100px;
+    }
+    .variant-btn {
+      border: none;
+      background: transparent;
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 100px;
+      cursor: pointer;
+      color: #475569;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .variant-btn.active {
+      background: white;
+      color: #0F172A;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+      transform: scale(1.02);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      padding: 20px 24px;
+      gap: 24px;
+      max-width: 1700px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .viewport-column {
+      flex: 1.5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tablet-frame {
+      width: 100%;
+      max-width: 980px;
+      aspect-ratio: 4 / 3;
+      background: #1E293B;
+      border-radius: 36px;
+      padding: 14px;
+      box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.4);
+      display: flex;
+      position: relative;
+    }
+    .tablet-screen {
+      flex: 1;
+      background: white;
+      border-radius: 24px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .info-column {
+      flex: 0.85;
+      background: white;
+      border-radius: 24px;
+      padding: 26px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+      overflow-y: auto;
+      max-height: calc(100vh - 110px);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .badge-coral { background: #FFE5E5; color: #FF334B; }
+    .badge-yellow { background: #FEF3C7; color: #D97706; }
+    .badge-green { background: #DCFCE7; color: #15803D; }
+    .badge-blue { background: #E0F2FE; color: #0284C7; }
+
+    .info-title { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+    .info-tagline { font-size: 14px; color: #64748B; line-height: 1.5; margin-bottom: 20px; }
+
+    .feature-card {
+      background: #F8FAFC;
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      border-left: 5px solid #CBD5E1;
+    }
+    .feature-card.primary { border-left-color: var(--coral); }
+    .feature-card.secondary { border-left-color: var(--blue); }
+    .feature-card.tertiary { border-left-color: var(--green); }
+    .feature-card h4 { font-size: 15px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+    .feature-card p { font-size: 13.5px; color: #475569; line-height: 1.45; }
+
+    /* ========================================================
+       WARIANT A: Otwarte Studio (Direct Tools + 18-Color Dock)
+       ======================================================== */
+    .va-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      background: #F8FAFC;
+    }
+    .va-left-tools {
+      width: 96px;
+      background: #FFFFFF;
+      border-right: 3px solid #E2E8F0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 6px;
+      gap: 8px;
+      overflow-y: auto;
+    }
+    .va-tool-btn {
+      width: 80px;
+      height: 64px;
+      background: #F1F5F9;
+      border-radius: 18px;
+      border: 3px solid transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 26px;
+      transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+    .va-tool-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #475569;
+      margin-top: 1px;
+    }
+    .va-tool-btn.active {
+      background: #FFE5E5;
+      border-color: #FF5A5F;
+      transform: scale(1.05);
+      box-shadow: 0 6px 14px rgba(255, 90, 95, 0.25);
+    }
+    .va-tool-btn.active .va-tool-label {
+      color: #FF334B;
+    }
+
+    .va-center {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .va-canvas {
+      flex: 1;
+      background: white;
+      margin: 10px 10px 0 10px;
+      border-radius: 18px;
+      box-shadow: inset 0 0 0 2px #E2E8F0;
+      position: relative;
+      cursor: crosshair;
+      overflow: hidden;
+    }
+    .va-sub-bar {
+      height: 48px;
+      background: #FFFBEB;
+      border: 2px solid #FDE68A;
+      margin: 8px 10px 0 10px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 12px;
+    }
+    .va-sub-item {
+      padding: 4px 12px;
+      border-radius: 100px;
+      background: white;
+      border: 2px solid #F59E0B;
+      font-size: 13px;
+      font-weight: 700;
+      color: #92400E;
+      cursor: pointer;
+    }
+
+    /* 18-color dual row palette */
+    .va-color-dock {
+      height: 110px;
+      background: #FFFFFF;
+      border-top: 3px solid #E2E8F0;
+      display: flex;
+      align-items: center;
+      padding: 8px 14px;
+      gap: 14px;
+    }
+    .va-color-grid {
+      flex: 1;
+      display: grid;
+      grid-template-rows: repeat(2, 42px);
+      grid-auto-flow: column;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .va-color-blob {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+      border: 3px solid white;
+      transition: transform 0.15s;
+    }
+    .va-color-blob.active {
+      transform: scale(1.22);
+      border-color: #0F172A;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+    }
+    .va-rainbow-blob {
+      background: conic-gradient(#FF5A5F, #FFB703, #06D6A0, #118AB2, #7B2CBF, #FF5A5F);
+    }
+
+    .va-size-picker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #F1F5F9;
+      padding: 6px 10px;
+      border-radius: 16px;
+    }
+    .va-size-circle {
+      background: #475569;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .va-size-circle.active {
+      background: #FF5A5F;
+    }
+
+    .va-undo-group {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .va-undo-btn {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      background: #FEF3C7;
+      border: 3px solid #F59E0B;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
+      transition: transform 0.1s;
+    }
+    .va-undo-btn:active {
+      transform: scale(0.92);
+    }
+    .va-undo-btn span {
+      font-size: 9.5px;
+      font-weight: 700;
+      color: #92400E;
+    }
+    .va-redo-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: #F1F5F9;
+      border: 2px solid #CBD5E1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      color: #64748B;
+      transition: transform 0.1s;
+    }
+    .va-redo-btn:active { transform: scale(0.92); }
+    .va-undo-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: #D97706;
+      background: #FEF3C7;
+      padding: 3px 8px;
+      border-radius: 100px;
+      text-align: center;
+      margin-top: 2px;
+    }
+
+    /* ========================================================
+       WARIANT B: Pasek Górny XXL + Wielka Paleta Dolna
+       ======================================================== */
+    .vb-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #F8FAFC;
+    }
+    .vb-top-ribbon {
+      height: 76px;
+      background: white;
+      border-bottom: 3px solid #E2E8F0;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 10px;
+      overflow-x: auto;
+    }
+    .vb-tool-pill {
+      min-width: 84px;
+      height: 60px;
+      background: #F8FAFC;
+      border: 3px solid #E2E8F0;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 24px;
+      transition: all 0.15s;
+    }
+    .vb-tool-pill.active {
+      background: #DCFCE7;
+      border-color: #10B981;
+      transform: scale(1.06);
+    }
+    .vb-canvas {
+      flex: 1;
+      background: white;
+      margin: 10px;
+      border-radius: 20px;
+      box-shadow: inset 0 0 0 2px #E2E8F0;
+      cursor: crosshair;
+      position: relative;
+      overflow: hidden;
+    }
+    .vb-color-bottom {
+      height: 100px;
+      background: white;
+      border-top: 3px solid #E2E8F0;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+    }
+
+    /* ========================================================
+       WARIANT C: Obustronne Panele (Dwa Skrzydła)
+       ======================================================== */
+    .vc-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      background: #F1F5F9;
+      padding: 10px;
+      gap: 12px;
+    }
+    .vc-dock-tools {
+      width: 100px;
+      background: white;
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 6px;
+      gap: 10px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+      overflow-y: auto;
+    }
+    .vc-canvas {
+      flex: 1;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+      position: relative;
+      cursor: crosshair;
+      overflow: hidden;
+    }
+    .vc-dock-colors {
+      width: 120px;
+      background: white;
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 6px;
+      gap: 10px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+      overflow-y: auto;
+    }
+    .vc-colors-2col {
+      display: grid;
+      grid-template-columns: repeat(2, 44px);
+      gap: 8px;
+    }
+
+    /* ========================================================
+       WARIANT D: Sztaluga i Pływająca Paleta XXL
+       ======================================================== */
+    .vd-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #FFFDF8;
+      position: relative;
+    }
+    .vd-top-header {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+    .vd-canvas {
+      flex: 1;
+      background: white;
+      margin: 0 16px;
+      border-radius: 20px;
+      border: 8px solid #E5D5C5;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      cursor: crosshair;
+      position: relative;
+      overflow: hidden;
+    }
+    .vd-floating-shelf {
+      height: 120px;
+      background: #FDF6EC;
+      border-top: 4px solid #D8C4B0;
+      display: flex;
+      flex-direction: column;
+      padding: 8px 16px;
+      gap: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-logo">🎨</div>
+      <div>
+        <h1>KidsPaint UX v2 — Bezpośredni Dostęp + Duża Paleta</h1>
+        <span>Wszystkie narzędzia w 1 kliknięcie, 18-20 dużych kolorów, dotyk 3+</span>
+      </div>
+    </div>
+
+    <nav class="variant-nav">
+      <button class="variant-btn active" onclick="switchVariant('A')">A. Otwarte Studio (Rekomendowane)</button>
+      <button class="variant-btn" onclick="switchVariant('B')">B. Górna Belka XXL</button>
+      <button class="variant-btn" onclick="switchVariant('C')">C. Obustronne Skrzydła</button>
+      <button class="variant-btn" onclick="switchVariant('D')">D. Klasyczna Sztaluga</button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="viewport-column">
+      <div class="tablet-frame">
+        <div class="tablet-screen" id="tabletScreen"></div>
+      </div>
+      <p style="margin-top: 12px; font-size: 13px; color: #64748B; font-weight: 600;">
+        👆 Testuj klikając na narzędzia i barwy: plamy lądują na płótnie z dźwiękiem syntezatora.
+      </p>
+    </div>
+
+    <div class="info-column" id="infoColumn"></div>
+  </main>
+
+  <script>
+    // 18 Child-friendly high contrast vibrant colors
+    const PALETTE_18 = [
+      { hex: "#E63946", name: "Czerwony" },
+      { hex: "#FF5A5F", name: "Koralowy" },
+      { hex: "#FF9F1C", name: "Pomarańczowy" },
+      { hex: "#FFD166", name: "Żółty słoneczny" },
+      { hex: "#D4E09B", name: "Limonkowy" },
+      { hex: "#06D6A0", name: "Zielony soczysty" },
+      { hex: "#2A9D8F", name: "Morski" },
+      { hex: "#118AB2", name: "Błękitny" },
+      { hex: "#0077B6", name: "Niebieski chabrowy" },
+      { hex: "#1D3557", name: "Granatowy nocny" },
+      { hex: "#7B2CBF", name: "Fioletowy" },
+      { hex: "#B5179E", name: "Śliwkowy" },
+      { hex: "#FF70A6", name: "Różowy malinowy" },
+      { hex: "#FFCAD4", name: "Pastelowy róż" },
+      { hex: "#F4A261", name: "Cielisty beż" },
+      { hex: "#6F4E37", name: "Czekoladowy brąz" },
+      { hex: "#222222", name: "Węglowy czarny" },
+      { hex: "#FFFFFF", name: "Biała kreda" }
+    ];
+
+    let currentColor = '#E63946';
+    let currentSize = 30;
+    let isRainbow = false;
+
+    const variants = {
+      'A': {
+        name: "Wariant A: Otwarte Studio (Direct Tools + 18 Barw)",
+        tagline: "Najbardziej bezpośredni interfejs: 8 narzędzi stale pod lewym palcem + pełna 2-rzędowa paleta 18 kolorów + tęcza.",
+        badge: "Rekomendowany (Pełny Dostęp)",
+        badgeClass: "badge-coral",
+        cards: [
+          {
+            title: "🚀 Wszystkie narzędzia widoczne na raz (Zero menu!)",
+            desc: "Pędzel, Pieczątki, Magia, Wiaderko, Kształty, Linie, Kolorowanki, Gumka — dziecko nie musi niczego rozwijać ani szukać w podmenu. 1 dotknięcie natychmiast aktywuje narzędzie.",
+            type: "primary"
+          },
+          {
+            title: "🎨 18 dużych plam koloru w podwójnym rzędzie",
+            desc: "Duże bąble (42px) ułożone w dwóch przejrzystych rzędach na dole. Dodatkowo kółko tęczowe 🌈 do malowania wielobarwną tęczą jednym ruchem.",
+            type: "secondary"
+          },
+          {
+            title: "⚡ Podręczny pasek opcji (np. kształty pieczątek)",
+            desc: "Gdy dziecko kliknie np. Pieczątki lub Kształty, tuż nad paletą pojawia się wąska, żółta półka z dużymi ikonkami do wyboru, bez zasłaniania rysunku.",
+            type: "tertiary"
+          }
+        ],
+        render: () => `
+          <div class="va-container">
+            <div class="va-left-tools">
+              <div class="va-tool-btn active" onclick="setTool(this, 'pędzel')">
+                <span>🖌️</span><span class="va-tool-label">Pędzel</span>
+              </div>
+              <div class="va-tool-btn" onclick="setTool(this, 'stempel')">
+                <span>🐾</span><span class="va-tool-label">Stemple</span>
+              </div>
+              <div class="va-tool-btn" onclick="setTool(this, 'magia')">
+                <span>🪄</span><span class="va-tool-label">Magia</span>
+              </div>
+              <div class="va-tool-btn" onclick="setTool(this, 'wiadro')">
+                <span>🪣</span><span class="va-tool-label">Wiadro</span>
+              </div>
+              <div class="va-tool-btn" onclick="setTool(this, 'kształty')">
+                <span>⭐</span><span class="va-tool-label">Kształty</span>
+              </div>
+              <div class="va-tool-btn" onclick="setTool(this, 'linie')">
+                <span>📏</span><span class="va-tool-label">Linie</span>
+              </div>
+              <div class="va-tool-btn" onclick="setTool(this, 'kolorowanka')">
+                <span>🐶</span><span class="va-tool-label">Koloruj</span>
+              </div>
+              <div class="va-tool-btn" onclick="setTool(this, 'gumka')">
+                <span>🧽</span><span class="va-tool-label">Gumka</span>
+              </div>
+            </div>
+
+            <div class="va-center">
+              <div class="va-canvas" onclick="drawSpot(event)"></div>
+
+              <div class="va-color-dock">
+                <div class="va-color-grid">
+                  ${PALETTE_18.map(c => `
+                    <div class="va-color-blob ${c.hex === currentColor ? 'active' : ''}"
+                         style="background: ${c.hex}; ${c.hex === '#FFFFFF' ? 'border: 3px solid #CBD5E1;' : ''}"
+                         title="${c.name}"
+                         onclick="selectColor(this, '${c.hex}')"></div>
+                  `).join('')}
+                  <div class="va-color-blob va-rainbow-blob" title="Tęcza" onclick="selectRainbow(this)"></div>
+                </div>
+
+                <div class="va-size-picker">
+                  <div class="va-size-circle" style="width:14px;height:14px;" onclick="setSize(this, 14)"></div>
+                  <div class="va-size-circle active" style="width:26px;height:26px;" onclick="setSize(this, 28)"></div>
+                  <div class="va-size-circle" style="width:40px;height:40px;" onclick="setSize(this, 46)"></div>
+                </div>
+
+                <div class="va-undo-group">
+                  <div class="va-undo-btn" id="undoBtn" title="Cofnij (bez limitu)" onclick="performUndo()">
+                    ↩️<span>Oops!</span>
+                  </div>
+                  <div class="va-redo-btn" id="redoBtn" title="Ponów" onclick="performRedo()">
+                    ↪️
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      'B': {
+        name: "Wariant B: Górna Belka XXL + Półka Barw",
+        tagline: "Układ horyzontalny: wszystkie narzędzia w rzędzie na górze, cała paleta 18 barw na dole.",
+        badge: "Układ Horyzontalny",
+        badgeClass: "badge-green",
+        cards: [
+          {
+            title: "🔝 Narzędzia jak klocki na samej górze",
+            desc: "Płótno ma maksymalną szerokość (od lewej do prawej krawędzi). Dziecko ma pod ręką duży pasek klocków z narzędziami na górze.",
+            type: "primary"
+          },
+          {
+            title: "🎨 18 Kolorów w jednym długim, przewijanym pasie",
+            desc: "Kolory na dole mają średnicę 50px — gigantyczne cele dotykowe. Można je szybko wybierać bez obawy o pomyłkę.",
+            type: "secondary"
+          },
+          {
+            title: "👶 Zaleta dla ekranów panoramicznych",
+            desc: "Świetnie sprawdza się na tabletach 16:9 / 16:10, gdzie boki ekranu są szerokie.",
+            type: "tertiary"
+          }
+        ],
+        render: () => `
+          <div class="vb-container">
+            <div class="vb-top-ribbon">
+              <div class="vb-tool-pill active" onclick="setTool(this, 'pędzel')"><span>🖌️</span><span style="font-size:10px;font-weight:700;">Pędzel</span></div>
+              <div class="vb-tool-pill" onclick="setTool(this, 'stempel')"><span>🐾</span><span style="font-size:10px;font-weight:700;">Stemple</span></div>
+              <div class="vb-tool-pill" onclick="setTool(this, 'magia')"><span>🪄</span><span style="font-size:10px;font-weight:700;">Magia</span></div>
+              <div class="vb-tool-pill" onclick="setTool(this, 'wiadro')"><span>🪣</span><span style="font-size:10px;font-weight:700;">Wiadro</span></div>
+              <div class="vb-tool-pill" onclick="setTool(this, 'kształty')"><span>⭐</span><span style="font-size:10px;font-weight:700;">Kształty</span></div>
+              <div class="vb-tool-pill" onclick="setTool(this, 'kolorowanka')"><span>🐶</span><span style="font-size:10px;font-weight:700;">Koloruj</span></div>
+              <div class="vb-tool-pill" onclick="setTool(this, 'gumka')"><span>🧽</span><span style="font-size:10px;font-weight:700;">Gumka</span></div>
+              <div class="vb-tool-pill" style="background:#FEF3C7;border-color:#F59E0B;" onclick="playBeep()"><span>↩️</span><span style="font-size:10px;font-weight:700;">Cofnij</span></div>
+            </div>
+
+            <div class="vb-canvas" onclick="drawSpot(event)"></div>
+
+            <div class="vb-color-bottom">
+              <div style="flex:1; display:flex; gap:10px; overflow-x:auto; padding: 4px;">
+                ${PALETTE_18.map(c => `
+                  <div class="va-color-blob ${c.hex === currentColor ? 'active' : ''}"
+                       style="min-width:48px;height:48px;background:${c.hex}; ${c.hex === '#FFFFFF' ? 'border:3px solid #CBD5E1;' : ''}"
+                       onclick="selectColor(this, '${c.hex}')"></div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      'C': {
+        name: "Wariant C: Obustronne Skrzydła (Lewa: Narzędzia, Prawa: Kolory)",
+        tagline: "Podział dwuręczny z pełną paletą: lewa dłoń zmienia narzędzia, prawa wybiera z 16 kolorów.",
+        badge: "Ergonomia Dwuręczna",
+        badgeClass: "badge-blue",
+        cards: [
+          {
+            title: "👐 Naturalny chwyt tabletu",
+            desc: "Dziecko opiera dłonie na ramkach po bokach. Lewy kciuk dosięga pędzla, stempla czy gumki, prawy kciuk dosięga kolumn kolorów.",
+            type: "primary"
+          },
+          {
+            title: "🎨 16 kolorów w podwójnej pionowej kolumnie",
+            desc: "Po prawej stronie 8 par kolorów w pionowym, wygodnym korytku. Dół i góra płótna pozostają całkowicie wolne od elementów UI.",
+            type: "secondary"
+          },
+          {
+            title: "👶 Czystość kompozycji",
+            desc: "Płótno w środku ma centralną ekspozycję. Dziecko nie brudzi rączką przycisków na dole podczas rysowania.",
+            type: "tertiary"
+          }
+        ],
+        render: () => `
+          <div class="vc-container">
+            <div class="vc-dock-tools">
+              <div class="va-tool-btn active" onclick="setTool(this, 'pędzel')"><span>🖌️</span><span class="va-tool-label">Pędzel</span></div>
+              <div class="va-tool-btn" onclick="setTool(this, 'stempel')"><span>🐾</span><span class="va-tool-label">Stemple</span></div>
+              <div class="va-tool-btn" onclick="setTool(this, 'magia')"><span>🪄</span><span class="va-tool-label">Magia</span></div>
+              <div class="va-tool-btn" onclick="setTool(this, 'wiadro')"><span>🪣</span><span class="va-tool-label">Wiadro</span></div>
+              <div class="va-tool-btn" onclick="setTool(this, 'gumka')"><span>🧽</span><span class="va-tool-label">Gumka</span></div>
+              <div class="va-tool-btn" style="background:#FEF3C7;border-color:#F59E0B;" onclick="playBeep()"><span>↩️</span><span class="va-tool-label">Cofnij</span></div>
+            </div>
+
+            <div class="vc-canvas" onclick="drawSpot(event)"></div>
+
+            <div class="vc-dock-colors">
+              <div class="vc-colors-2col">
+                ${PALETTE_18.slice(0, 16).map(c => `
+                  <div class="va-color-blob ${c.hex === currentColor ? 'active' : ''}"
+                       style="width:42px;height:42px;background:${c.hex}; ${c.hex === '#FFFFFF' ? 'border:3px solid #CBD5E1;' : ''}"
+                       onclick="selectColor(this, '${c.hex}')"></div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      'D': {
+        name: "Wariant D: Klasyczna Sztaluga i Pływająca Paleta",
+        tagline: "Artystyczna sztaluga: narzędzia w słoikach na górze, podwójna szeroka paleta farb na dole.",
+        badge: "Styl Artystyczny",
+        badgeClass: "badge-yellow",
+        cards: [
+          {
+            title: "🖼️ Obrazek w drewnianej ramie",
+            desc: "Płótno wygląda jak prawdziwe płótno malarskie w ramie. Narzędzia na górnej półce (pędzle, pieczątki, gąbka).",
+            type: "primary"
+          },
+          {
+            title: "🎨 18 kleksów farby na desce malarskiej",
+            desc: "Na dole znajduje się duża deska malarska z 18 kleksami farby w dwóch rzędach oraz miejscem na mieszanie.",
+            type: "secondary"
+          },
+          {
+            title: "👶 Ciepły, przyjazny klimat",
+            desc: "Wizualnie nawiązuje do tradycyjnych farb plakatowych i kredek świecowych.",
+            type: "tertiary"
+          }
+        ],
+        render: () => `
+          <div class="vd-container">
+            <div class="vd-top-header">
+              <div style="display:flex;gap:10px;">
+                <div class="va-tool-btn active" style="width:68px;height:52px;" onclick="setTool(this, 'pędzel')"><span>🖌️</span></div>
+                <div class="va-tool-btn" style="width:68px;height:52px;" onclick="setTool(this, 'stempel')"><span>🐾</span></div>
+                <div class="va-tool-btn" style="width:68px;height:52px;" onclick="setTool(this, 'magia')"><span>🪄</span></div>
+                <div class="va-tool-btn" style="width:68px;height:52px;" onclick="setTool(this, 'wiadro')"><span>🪣</span></div>
+                <div class="va-tool-btn" style="width:68px;height:52px;" onclick="setTool(this, 'gumka')"><span>🧽</span></div>
+              </div>
+              <div class="va-undo-btn" style="width:50px;height:50px;" onclick="playBeep()">↩️</div>
+            </div>
+
+            <div class="vd-canvas" onclick="drawSpot(event)"></div>
+
+            <div class="vd-floating-shelf">
+              <div style="display:grid;grid-template-rows:repeat(2,38px);grid-auto-flow:column;gap:8px;overflow-x:auto;">
+                ${PALETTE_18.map(c => `
+                  <div class="va-color-blob ${c.hex === currentColor ? 'active' : ''}"
+                       style="width:38px;height:38px;background:${c.hex}; ${c.hex === '#FFFFFF' ? 'border:3px solid #CBD5E1;' : ''}"
+                       onclick="selectColor(this, '${c.hex}')"></div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `
+      }
+    };
+
+    function switchVariant(key) {
+      document.querySelectorAll('.variant-btn').forEach((btn, idx) => {
+        const keys = ['A', 'B', 'C', 'D'];
+        btn.classList.toggle('active', keys[idx] === key);
+      });
+
+      const data = variants[key];
+      const screen = document.getElementById('tabletScreen');
+      screen.innerHTML = data.render();
+
+      const info = document.getElementById('infoColumn');
+      let cardsHtml = data.cards.map(c => `
+        <div class="feature-card ${c.type}">
+          <h4>${c.title}</h4>
+          <p>${c.desc}</p>
+        </div>
+      `).join('');
+
+      info.innerHTML = `
+        <span class="badge ${data.badgeClass}">${data.badge}</span>
+        <h2 class="info-title">${data.name}</h2>
+        <p class="info-tagline">${data.tagline}</p>
+        ${cardsHtml}
+      `;
+    }
+
+    function setTool(el, toolName) {
+      document.querySelectorAll('.va-tool-btn, .vb-tool-pill').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      playBeep();
+    }
+
+    function selectColor(el, hex) {
+      document.querySelectorAll('.va-color-blob').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      currentColor = hex;
+      isRainbow = false;
+      playBeep();
+    }
+
+    function selectRainbow(el) {
+      document.querySelectorAll('.va-color-blob').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      isRainbow = true;
+      playBeep();
+    }
+
+    function setSize(el, sz) {
+      document.querySelectorAll('.va-size-circle').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      currentSize = sz;
+      playBeep();
+    }
+
+    let undoStack = [];
+    let redoStack = [];
+    let currentStroke = null;
+    let isDrawing = false;
+
+    function initCanvasInteractions() {
+      const canvas = document.querySelector('.va-canvas, .vb-canvas, .vc-canvas, .vd-canvas');
+      if (!canvas) return;
+
+      canvas.onpointerdown = (e) => {
+        isDrawing = true;
+        canvas.setPointerCapture(e.pointerId);
+        currentStroke = [];
+        addDotAt(e, canvas);
+      };
+
+      canvas.onpointermove = (e) => {
+        if (!isDrawing) return;
+        addDotAt(e, canvas);
+      };
+
+      canvas.onpointerup = (e) => {
+        if (!isDrawing) return;
+        isDrawing = false;
+        if (currentStroke && currentStroke.length > 0) {
+          undoStack.push(currentStroke);
+          redoStack = []; // clear redo on new action
+          updateUndoStatus();
+        }
+        currentStroke = null;
+      };
+    }
+
+    function addDotAt(e, canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const dot = document.createElement('div');
+      dot.style.position = 'absolute';
+      dot.style.left = (x - currentSize/2) + 'px';
+      dot.style.top = (y - currentSize/2) + 'px';
+      dot.style.width = currentSize + 'px';
+      dot.style.height = currentSize + 'px';
+      dot.style.borderRadius = '50%';
+      if (isRainbow) {
+        dot.style.background = 'conic-gradient(#FF5A5F, #FFB703, #06D6A0, #118AB2, #7B2CBF, #FF5A5F)';
+      } else {
+        dot.style.backgroundColor = currentColor;
+      }
+      dot.style.pointerEvents = 'none';
+      dot.style.boxShadow = '0 3px 8px rgba(0,0,0,0.14)';
+      dot.style.transform = 'scale(0.3)';
+      dot.style.transition = 'transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      canvas.appendChild(dot);
+
+      setTimeout(() => {
+        dot.style.transform = 'scale(1)';
+      }, 10);
+
+      if (currentStroke) {
+        currentStroke.push(dot);
+      }
+      playPop();
+    }
+
+    function drawSpot(e) {
+      // Fallback for click if pointer events missed
+      if (!isDrawing) {
+        const canvas = e.currentTarget;
+        const single = [];
+        currentStroke = single;
+        addDotAt(e, canvas);
+        undoStack.push(single);
+        redoStack = [];
+        updateUndoStatus();
+        currentStroke = null;
+      }
+    }
+
+    function performUndo() {
+      if (undoStack.length === 0) return;
+      const stroke = undoStack.pop();
+      stroke.forEach(dot => {
+        if (dot.parentNode) dot.parentNode.removeChild(dot);
+      });
+      redoStack.push(stroke);
+      playOops();
+      updateUndoStatus();
+    }
+
+    function performRedo() {
+      if (redoStack.length === 0) return;
+      const stroke = redoStack.pop();
+      const canvas = document.querySelector('.va-canvas, .vb-canvas, .vc-canvas, .vd-canvas');
+      if (canvas) {
+        stroke.forEach(dot => canvas.appendChild(dot));
+      }
+      undoStack.push(stroke);
+      playBeep();
+      updateUndoStatus();
+    }
+
+    function updateUndoStatus() {
+      const btn = document.getElementById('undoBtn');
+      const badge = document.getElementById('undoBadge');
+      if (btn) {
+        btn.style.opacity = undoStack.length > 0 ? '1' : '0.4';
+      }
+      const redoBtn = document.getElementById('redoBtn');
+      if (redoBtn) {
+        redoBtn.style.opacity = redoStack.length > 0 ? '1' : '0.4';
+      }
+      if (badge) {
+        badge.textContent = `Cofnij: ${undoStack.length} kroków (bez limitu!)`;
+      }
+    }
+
+    function playOops() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(360, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.18);
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.18);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.18);
+    }
+
+    // Audio effects
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playBeep() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(480, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.09);
+      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.09);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.09);
+    }
+
+    function playPop() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(320, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(140, audioCtx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.08);
+    }
+
+    // Default to Variant A
+    switchVariant('A');
+  </script>
+</body>
+</html>
