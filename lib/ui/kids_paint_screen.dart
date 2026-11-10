@@ -17,6 +17,7 @@ class KidsPaintScreen extends StatefulWidget {
 
 class _KidsPaintScreenState extends State<KidsPaintScreen> {
   late final DrawingController _controller;
+  DrawingController get controller => _controller;
 
   @override
   void initState() {

@@ -128,7 +128,6 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
         widget.controller.addFill(localPos, filledImage: newUiImage);
       }
     } catch (e) {
-      debugPrint('Flood fill error: $e');
       widget.controller.addFill(localPos);
     } finally {
       _isProcessingFill = false;
